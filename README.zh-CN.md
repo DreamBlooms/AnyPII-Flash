@@ -39,8 +39,7 @@ python3.12 -m venv .venv
   --out models/gliner2.5-multi-Decide
 ```
 
-只有在需要镜像时使用 `--endpoint`；不传时使用 Hugging Face 默认地址。模型权重
-目录已加入 `.gitignore`，不会进入版本库。
+只有在需要镜像时使用 `--endpoint`；不传时使用 Hugging Face 默认地址。
 
 ## 启动
 
@@ -252,9 +251,9 @@ text + types
 
 ## 性能
 
-测试机器：**AMD Ryzen 9 7940HX with Radeon Graphics**，16 个物理核心（32 线程；
-当前环境分配 16 个逻辑 CPU），48 GiB 内存。两个服务都限制为 12 个 CPU 线程。
-两个模型都在计时前完成加载，表中全部为稳态结果；结果缓存关闭，前缀缓存开启，
+测试设备：**AMD Ryzen 9 7940HX with Radeon Graphics**，16 个物理核心（32 线程；
+测试环境分配 16 个逻辑 CPU），48 GiB 内存。两个服务都限制为 12 个 CPU 线程。
+表中全部为稳态结果；结果缓存关闭，前缀缓存开启，
 耗时为客户端 wall time 的重复请求最短用时。
 
 | 请求 | AnyPII + Qwen3.5-0.8B Q8_0 | AnyPII Flash，`flash` | AnyPII Flash，`flash-plus` |
@@ -301,8 +300,8 @@ ANYPPI_FLASH_TEST_PLUS_MODEL=models/gliner2.5-multi-Decide \
   显式 `flash` 稳定；混合策略下每个 auto 片段增加类型精修和打码/保留两次前向。
 - 类型精修是启发式的：只有超过 `type_refine_threshold` 才接受新类型，仍可能把原本
   正确的类型改错。
-- 策略分类是零样本能力。上线前应在自己的数据上检查 `redact_threshold` 和策略写法。
-- 模型权重是独立产物，分发前请确认模型卡的许可条款。
+- 策略分类是零样本能力。在生产环境中上线前应在您自己的数据上检查 `redact_threshold` 和策略写法。
+- 模型权重是独立产物，使用前请确认模型卡的许可条款。
 
 ## 许可证
 
