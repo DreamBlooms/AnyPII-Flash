@@ -24,6 +24,12 @@ AnyPII Flash 是一个独立的 Python 本地脱敏服务。它使用
 ```sh
 python3.12 -m venv .venv
 .venv/bin/pip install -e ".[model,dev]"
+
+# 也可以直接安装 requirements：
+.venv/bin/pip install -r requirements-dev.txt
+
+# 可选：使用 uv 一键创建环境并安装依赖
+uv sync --extra model --extra dev
 ```
 
 下载模型：

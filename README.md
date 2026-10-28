@@ -25,6 +25,12 @@ for local inference.
 ```sh
 python3.12 -m venv .venv
 .venv/bin/pip install -e ".[model,dev]"
+
+# Or install from the plain requirements files:
+.venv/bin/pip install -r requirements-dev.txt
+
+# Optional: one-command uv setup (creates .venv and installs extras)
+uv sync --extra model --extra dev
 ```
 
 Download the checkpoints once:
