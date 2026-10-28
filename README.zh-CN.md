@@ -255,18 +255,17 @@ text + types
 测试机器：**AMD Ryzen 9 7940HX with Radeon Graphics**，16 个物理核心（32 线程；
 当前环境分配 16 个逻辑 CPU），48 GiB 内存。两个服务都限制为 12 个 CPU 线程。
 两个模型都在计时前完成加载，表中全部为稳态结果；结果缓存关闭，前缀缓存开启，
-耗时为客户端 wall time 的重复请求中位数。
+耗时为客户端 wall time 的重复请求最短用时。
 
 | 请求 | AnyPII + Qwen3.5-0.8B Q8_0 | AnyPII Flash，`flash` | AnyPII Flash，`flash-plus` |
 | --- | ---: | ---: | ---: |
-| `medical.json` | 2.88s | 0.11s | 1.08s |
-| `medical-long.json` | 8.89s | 1.72s | 8.14s |
-| `contact.json` | <1ms | 0.08s | 0.31s |
+| `medical.json` | 2.87s | 0.10s | 0.96s |
+| `medical-long.json` | 8.32s | 1.71s | 7.76s |
+| `contact.json` | <1ms | 0.08s | 0.29s |
 
-`flash` 在短医疗请求上快 27.2 倍，在长医疗请求上快 5.2 倍。`flash-plus` 在长
-请求上仍快于 AnyPII，但类型精修和逐片段决策会增加开销。`flash-plus` 长文本
-五次重复测量的范围为 7.97–8.29 秒，表内取 8.14 秒作为中位数。`contact.json`
-是例外：AnyPII 通过格式快速路径在 1ms 内完成。
+`flash` 在短医疗请求上快 28.4 倍，在长医疗请求上快 4.9 倍。`flash-plus` 在长
+请求上仍快于 AnyPII，但类型精修和逐片段决策会增加开销。`contact.json` 是例外：
+AnyPII 通过格式快速路径在 1ms 内完成。
 
 ## 测试
 

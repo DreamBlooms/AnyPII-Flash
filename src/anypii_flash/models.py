@@ -75,6 +75,9 @@ class PlusUsage(BaseModel):
     type_refined: int = 0
     type_refine_forward_passes: int = 0
     type_refine_threshold: float | None = None
+    action_elapsed_ms: float = 0.0
+    type_refine_elapsed_ms: float = 0.0
+    decision_elapsed_ms: float = 0.0
 
 
 class Usage(BaseModel):

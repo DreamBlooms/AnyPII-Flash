@@ -307,6 +307,7 @@ def process_request(
             type_refined=0,
             type_refine_forward_passes=0,
             type_refine_threshold=refine_threshold,
+            action_elapsed_ms=round(action_elapsed_ms, 3),
         )
     else:
         auto_hits = [hit for hit in hits if hit.auto]
@@ -361,6 +362,9 @@ def process_request(
                 type_refined=type_refined,
                 type_refine_forward_passes=type_refine_forward_passes,
                 type_refine_threshold=refine_threshold,
+                action_elapsed_ms=round(action_elapsed_ms, 3),
+                type_refine_elapsed_ms=round(type_refine_elapsed_ms, 3),
+                decision_elapsed_ms=round(decisions.elapsed_ms, 3),
             )
         elif type_refined:
             plus_usage = PlusUsage(
@@ -375,6 +379,8 @@ def process_request(
                 type_refined=type_refined,
                 type_refine_forward_passes=type_refine_forward_passes,
                 type_refine_threshold=refine_threshold,
+                action_elapsed_ms=round(action_elapsed_ms, 3),
+                type_refine_elapsed_ms=round(type_refine_elapsed_ms, 3),
             )
 
     if request.skip_keep_types or request.omit_keep_spans:

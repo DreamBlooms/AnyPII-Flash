@@ -266,20 +266,19 @@ Reference machine: **AMD Ryzen 9 7940HX with Radeon Graphics**, 16 physical
 cores (32 threads; this environment allocates 16 logical CPUs), 48 GiB RAM. Both
 services used 12 CPU threads. Both models were fully loaded before timing; all
 entries are steady state. Result caches were disabled, prefix caches were
-enabled, and timings are client wall-clock medians of repeated requests.
+enabled, and timings are the shortest client wall-clock time observed across
+repeated requests.
 
 | request | AnyPII + Qwen3.5-0.8B Q8_0 | AnyPII Flash, `flash` | AnyPII Flash, `flash-plus` |
 | --- | ---: | ---: | ---: |
-| `medical.json` | 2.88s | 0.11s | 1.08s |
-| `medical-long.json` | 8.89s | 1.72s | 8.14s |
-| `contact.json` | <1ms | 0.08s | 0.31s |
+| `medical.json` | 2.87s | 0.10s | 0.96s |
+| `medical-long.json` | 8.32s | 1.71s | 7.76s |
+| `contact.json` | <1ms | 0.08s | 0.29s |
 
-`flash` is 27.2x faster on the short medical request and 5.2x faster on the long
+`flash` is 28.4x faster on the short medical request and 4.9x faster on the long
 one. `flash-plus` remains faster than AnyPII on the long request, but its
-type-refinement and per-span decision stages add cost. A five-run check of the
-`flash-plus` long case ranged from 7.97s to 8.29s; the table uses 8.14s as the
-median. `contact.json` is an exception: AnyPII resolves it through its format
-fast path in under 1 ms.
+type-refinement and per-span decision stages add cost. `contact.json` is an
+exception: AnyPII resolves it through its format fast path in under 1 ms.
 
 ## Tests
 
