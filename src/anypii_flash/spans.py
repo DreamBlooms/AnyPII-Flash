@@ -24,6 +24,8 @@ class SpanHit:
     type_id: str
     score: float
     redacted: bool
+    auto: bool = False
+    redact_score: float = -1.0
 
 
 def normalize_spans(
@@ -54,8 +56,9 @@ def normalize_spans(
         if key in seen:
             continue
         seen.add(key)
+        auto = spec.redact is None
         redacted = bool(spec.redact)
-        if (omit_keep_spans or skip_keep_types) and not redacted:
+        if not auto and (omit_keep_spans or skip_keep_types) and not redacted:
             continue
         candidates.append(
             SpanHit(
@@ -65,6 +68,7 @@ def normalize_spans(
                 type_id=item.type_id,
                 score=item.score,
                 redacted=redacted,
+                auto=auto,
             )
         )
 
@@ -101,7 +105,14 @@ def group_spans(hits: list[SpanHit]) -> tuple[list[EntitySpan], list[int]]:
                     occurrences=[],
                 )
             )
-        groups[index].occurrences.append(Occurrence(start=hit.start, end=hit.end, score=hit.score))
+        groups[index].occurrences.append(
+            Occurrence(
+                start=hit.start,
+                end=hit.end,
+                score=hit.score,
+                redact_score=hit.redact_score if hit.redact_score >= 0.0 else None,
+            )
+        )
         group_index.append(index)
 
     return groups, group_index

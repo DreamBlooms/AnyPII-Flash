@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from . import __version__
 from .cache import ResultCache
 from .config import Settings
+from .decider import DecideClassifier, Decider
 from .errors import AnyPiiError, ModelUnavailableError
 from .extractor import Extractor, GlinerExtractor
 from .models import AnyPiiRequest, AnyPiiResponse
@@ -22,7 +23,11 @@ def _error(message: str, error_type: str = "invalid_request_error") -> dict:
     return {"error": {"message": message, "type": error_type}}
 
 
-def create_app(settings: Settings | None = None, extractor: Extractor | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    extractor: Extractor | None = None,
+    decider: Decider | None = None,
+) -> FastAPI:
     settings = settings or Settings.from_env()
 
     @asynccontextmanager
@@ -45,6 +50,7 @@ def create_app(settings: Settings | None = None, extractor: Extractor | None = N
     )
     app.state.settings = settings
     app.state.extractor = extractor
+    app.state.decider = decider or DecideClassifier(settings)
     app.state.cache = ResultCache(settings.result_cache_entries, settings.result_cache_bytes)
     app.state.ready = False
     logging.basicConfig(level=getattr(logging, settings.log_level.upper(), logging.INFO))
@@ -107,6 +113,8 @@ def create_app(settings: Settings | None = None, extractor: Extractor | None = N
             "model": current.model_name if current else settings.model_label,
             "backend": current.backend_name if current else settings.backend_label,
             "architecture": "boundary",
+            "plus_model": settings.plus_model_id,
+            "plus_ready": bool(getattr(app.state.decider, "ready", False)),
             "version": __version__,
         }
 
@@ -118,7 +126,7 @@ def create_app(settings: Settings | None = None, extractor: Extractor | None = N
                 {
                     "id": current.model_name if current else settings.model_label,
                     "object": "model",
-                    "owned_by": "fastino",
+                    "owned_by": "anypii-flash",
                 }
             ]
         }
@@ -127,18 +135,19 @@ def create_app(settings: Settings | None = None, extractor: Extractor | None = N
         return process_request(
             request,
             app.state.extractor,
+            app.state.decider,
             app.state.cache,
             settings,
         )
 
-    @app.post("/v1/anypii", response_model=AnyPiiResponse)
+    @app.post("/v1/anypii", response_model=AnyPiiResponse, response_model_exclude_none=True)
     def anypii(
         request: AnyPiiRequest,
         _: None = Depends(require_api_key),
     ) -> AnyPiiResponse:
         return handle(request)
 
-    @app.post("/v1/flash", response_model=AnyPiiResponse)
+    @app.post("/v1/flash", response_model=AnyPiiResponse, response_model_exclude_none=True)
     def flash(
         request: AnyPiiRequest,
         _: None = Depends(require_api_key),

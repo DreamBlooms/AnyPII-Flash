@@ -45,3 +45,68 @@ class FakeExtractor:
                         )
                     )
         return out, ExtractionStats(chunks=1, word_tokens=len(text), forward_passes=1)
+
+
+@dataclass
+class FakeDecider:
+    model_name: str = "fake-gliner2.5-multi-Decide"
+    backend_name: str = "Fake"
+    ready: bool = True
+    scores: dict[str, float] | None = None
+    calls: int = 0
+    last_text: str = ""
+    last_policy: str = ""
+    last_items: list = None
+    type_refinements: dict[str, tuple[str, float]] | None = None
+    action: str | None = None
+    action_confidence: float = 0.0
+
+    def __post_init__(self) -> None:
+        if self.scores is None:
+            self.scores = {
+                "patient_name": 0.9,
+                "clinician_name": 0.1,
+                "drug_generic": 0.2,
+                "drug_brand": 0.8,
+                "pharma_company": 0.4,
+            }
+
+    def refine_types(self, text: str, items, types, threshold: float | None = None):
+        from anypii_flash.decider import TypeRefinementBatch
+
+        threshold = 0.55 if threshold is None else threshold
+        out = {}
+        for item in items:
+            value = (self.type_refinements or {}).get(item.type_id)
+            if value is not None and value[1] >= threshold:
+                out[item.index] = value
+        return TypeRefinementBatch(
+            types=out,
+            elapsed_ms=5.0,
+            forward_passes=len(items),
+        )
+
+    def classify_action(self, text: str, policy: str):
+        from anypii_flash.decider import ActionDecision
+
+        return ActionDecision(
+            action=self.action,
+            confidence=self.action_confidence,
+            elapsed_ms=5.0,
+            forward_passes=1,
+        )
+
+    def decide(self, text: str, policy: str, items, action=None):
+        from anypii_flash.decider import DecisionBatch
+
+        self.calls += 1
+        self.last_text = text
+        self.last_policy = policy
+        self.last_items = list(items)
+        return DecisionBatch(
+            scores={item.index: self.scores.get(item.type_id, 0.0) for item in items},
+            elapsed_ms=12.5,
+            forward_passes=1,
+            action=self.action,
+            action_confidence=self.action_confidence,
+        )

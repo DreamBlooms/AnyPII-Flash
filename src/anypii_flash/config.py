@@ -18,6 +18,7 @@ def _env_float(name: str, default: float) -> float:
 @dataclass(frozen=True)
 class Settings:
     model_id: str = "fastino/gliner2.5-multi-v1"
+    plus_model_id: str = "fastino/GLiNER2.5-multi-Decide"
     device: str = "cpu"
     splitter: str = "char"
     chunk_size: int = 384
@@ -26,6 +27,10 @@ class Settings:
     max_text_cp: int = 16000
     max_payload_bytes: int = 2 * 1024 * 1024
     threshold: float = 0.55
+    policy_threshold: float = 0.5
+    policy_action_threshold: float = 0.8
+    type_refine_threshold: float = 0.7
+    plus_batch_size: int = 8
     host: str = "127.0.0.1"
     port: int = 8080
     api_key: str = ""
@@ -52,6 +57,7 @@ class Settings:
     def from_env(cls) -> Settings:
         return cls(
             model_id=os.getenv("ANYPPI_FLASH_MODEL", cls.model_id),
+            plus_model_id=os.getenv("ANYPPI_FLASH_PLUS_MODEL", cls.plus_model_id),
             device=os.getenv("ANYPPI_FLASH_DEVICE", cls.device),
             splitter=os.getenv("ANYPPI_FLASH_SPLITTER", cls.splitter),
             chunk_size=_env_int("ANYPPI_FLASH_CHUNK_SIZE", cls.chunk_size),
@@ -60,6 +66,7 @@ class Settings:
             max_text_cp=_env_int("ANYPPI_FLASH_MAX_TEXT_CP", cls.max_text_cp),
             max_payload_bytes=_env_int("ANYPPI_FLASH_MAX_PAYLOAD_BYTES", cls.max_payload_bytes),
             threshold=_env_float("ANYPPI_FLASH_THRESHOLD", cls.threshold),
+            policy_threshold=_env_float("ANYPPI_FLASH_POLICY_THRESHOLD", cls.policy_threshold),
             host=os.getenv("ANYPPI_FLASH_HOST", cls.host),
             port=_env_int("ANYPPI_FLASH_PORT", cls.port),
             api_key=os.getenv("ANYPPI_FLASH_API_KEY", cls.api_key),

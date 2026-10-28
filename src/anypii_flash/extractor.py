@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 class TypeSpec:
     id: str
     description: str
-    redact: bool
+    redact: bool | None
 
 
 @dataclass(frozen=True)
