@@ -1,0 +1,8 @@
+AnyPII Flash is licensed under MIT.
+
+GLiNER2 is developed by Fastino and licensed under Apache-2.0:
+https://github.com/fastino-ai/GLiNER2
+
+The GLiNER2.5 model weights are separate artifacts and retain their own
+license terms. Verify the model card before redistribution:
+https://huggingface.co/fastino/gliner2.5-multi-v1
